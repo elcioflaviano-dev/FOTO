@@ -54,8 +54,8 @@ html_code = """
         .camera-box {
             position: relative;
             width: 100%;
-            max-width: 380px; /* Um pouco mais larga para acomodar melhor o rosto */
-            aspect-ratio: 3 / 4; /* Proporção ideal para dar largura e altura equilibradas */
+            max-width: 300px; /* Mais estreito para fechar as laterais da moldura */
+            aspect-ratio: 4 / 5; /* Formato bem mais vertical e fechado */
             margin: 10px auto;
             border-radius: 10px;
             overflow: hidden;
@@ -69,8 +69,7 @@ html_code = """
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Deixa a imagem um pouco mais larga nas laterais (-1.1) e ajustada no zoom */
-            transform: translateY(-10%) scaleX(-1.1) scale(0.85);
+            transform: translateY(-10%) scaleX(-1) scale(0.95);
             transition: transform 0.1s;
         }
         #moldura-preview {
@@ -132,7 +131,7 @@ html_code = """
             <div class="controles-duplos">
                 <div class="controle-item">
                     <label for="zoom" style="font-size: 13px; font-weight: bold;">🔍 Tamanho:</label>
-                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.85" oninput="ajustarCamera()">
+                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.95" oninput="ajustarCamera()">
                 </div>
                 <div class="controle-item">
                     <label for="pos-y" style="font-size: 13px; font-weight: bold;">↕️ Altura:</label>
@@ -173,14 +172,13 @@ html_code = """
         function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
             const posY = document.getElementById('pos-y').value;
-            // Mantém a proporção mais larga nas laterais com -1.1 no scaleX
-            video.style.transform = `translateY(${posY}%) scaleX(-1.1) scale(${zoom})`;
+            video.style.transform = `translateY(${posY}%) scaleX(-1) scale(${zoom})`;
         }
 
         async function iniciarCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user", width: { ideal: 960 }, height: { ideal: 1280 } }
+                    video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } }
                 });
                 video.srcObject = stream;
                 
@@ -208,8 +206,11 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            // Define o canvas seguindo a proporção vertical mais estreita (4:5) para salvar exato
+            const targetWidth = 720;
+            const targetHeight = 900;
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
             
             ctx.fillStyle = "#000000";
@@ -218,11 +219,12 @@ html_code = """
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.translate(0, canvas.height * (posY / 100));
-            // Espelha e aplica a mesma largura esticada (-1.1) e zoom da tela de prévia
-            ctx.scale(-1.1 * zoom, zoom);
-            ctx.drawImage(video, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+            ctx.scale(-zoom, zoom);
+            // Centraliza e preenche o corte vertical 4:5 perfeitamente
+            ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
             ctx.restore();
             
+            // Carimba a moldura ajustada nas dimensões estreitas
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.95);
