@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foto de Natal - Equipe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #0c3b2e; 
+            color: white;
+            padding: 10px;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #b22222; 
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #ffcc00;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+        
+        .camera-box {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin: 15px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            display: none;
+        }
+        video {
+            width: 100%;
+            display: block;
+            transform: scaleX(-1);
+        }
+        #moldura-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; 
+        }
+        
+        #status-envio { font-weight: bold; color: #ffeb3b; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🎄 Foto de Natal 🎅</h2>
+        <p style="font-size: 14px;">Escolha seu cenário, encaixe o rosto e sorria!</p>
+        
+        <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
+        
+        <!-- TROQUE OS VALORES ABAIXO PELO NOME DOS ARQUIVOS QUE VOCÊ SUBIU NO GITHUB -->
+        <select id="tema" onchange="trocarMoldura()">
+            <option value="nome_do_arquivo_1.png">Cenário 1 - Papai Noel</option>
+            <option value="nome_do_arquivo_2.png">Cenário 2 - Duende</option>
+            <option value="nome_do_arquivo_3.png">Cenário 3 - Rena</option>
+        </select>
+        
+        <button id="btn-iniciar" onclick="iniciarCamera()">1. Ativar Câmera</button>
+        
+        <div class="camera-box" id="camera-box">
+            <video id="video" autoplay playsinline></video>
+            <!-- A imagem inicial que carrega na tela -->
+            <img id="moldura-preview" src="nome_do_arquivo_1.png" alt="Moldura">
+        </div>
+        
+        <canvas id="canvas" style="display:none;"></canvas>
+        
+        <p id="status-envio">Enviando para o Polo Norte (Drive)... 🛷</p>
+
+        <div id="controles" style="display:none; margin-top: 15px;">
+            <button id="btn-capturar" onclick="capturar()">📸 Capturar e Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        // COLE AQUI A URL DO SEU GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsh8xXp6UfvNZR7ts3gadeUWwogMI8pro6PWIOEX-PnvVCl1lvF9SYyXgJvQKENC1CVw/exec";
+
+        const video = document.getElementById('video');
+        const molduraPreview = document.getElementById('moldura-preview');
+        const canvas = document.getElementById('canvas');
+        const controles = document.getElementById('controles');
+        const statusEnvio = document.getElementById('status-envio');
+        const btnCapturar = document.getElementById('btn-capturar');
+
+        function trocarMoldura() {
+            const temaSelecionado = document.getElementById('tema').value;
+            molduraPreview.src = temaSelecionado;
+        }
+
+        async function iniciarCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                video.srcObject = stream;
+                document.getElementById('camera-box').style.display = "block";
+                controles.style.display = "block";
+                document.getElementById('btn-iniciar').style.display = "none";
+            } catch (erro) {
+                alert("Erro ao acessar a câmera. Libere o acesso no navegador.");
+            }
+        }
+
+        async function capturar() {
+            const nome = document.getElementById('nome').value.trim().replace(/ /g, '_'); 
+            const tema = document.getElementById('tema').value.replace('.png', '');
+
+            if (!nome) {
+                alert("Por favor, preencha o seu nome antes de tirar a foto!");
+                return;
+            }
+
+            btnCapturar.disabled = true;
+            statusEnvio.style.display = "block";
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
+
+            const imagemFinal = canvas.toDataURL('image/jpeg', 0.9);
+            const nomeArquivo = `Natal_${nome}_${tema}.jpg`;
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        filename: nomeArquivo,
+                        image: imagemFinal
+                    })
+                });
+                
+                btnCapturar.innerText = "✅ Foto Enviada! Feliz Natal!";
+                btnCapturar.style.backgroundColor = "#28a745";
+            } catch (erro) {
+                alert("Erro ao enviar para o Drive.");
+                btnCapturar.disabled = false;
+                btnCapturar.innerText = "📸 Tentar Novamente";
+            } finally {
+                statusEnvio.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
