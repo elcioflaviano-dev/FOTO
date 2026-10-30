@@ -99,7 +99,7 @@
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
             <!-- Corrigido para carregar a imagem 1 da pasta natal por padrão -->
-            <img id="moldura-preview" src="natal/1.png" alt="Moldura">
+            <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
         </div>
         
         <canvas id="canvas" style="display:none;"></canvas>
@@ -123,9 +123,10 @@
 
         function trocarMoldura() {
             const temaSelecionado = document.getElementById('tema').value;
+            molduraPreview.setAttribute('crossorigin', 'anonymous');
             molduraPreview.src = temaSelecionado;
         }
-
+       
         async function iniciarCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
