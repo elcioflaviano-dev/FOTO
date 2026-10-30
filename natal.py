@@ -54,8 +54,8 @@ html_code = """
         .camera-box {
             position: relative;
             width: 100%;
-            max-width: 300px; /* Moldura estreita e fixa */
-            aspect-ratio: 4 / 5; /* Formato vertical */
+            max-width: 300px; /* Moldura estreita */
+            aspect-ratio: 4 / 5; /* Formato vertical alinhado */
             margin: 10px auto;
             border-radius: 10px;
             overflow: hidden;
@@ -69,8 +69,8 @@ html_code = """
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Estica apenas a largura (-1.35) mantendo a altura intacta controlada pelo zoom */
-            transform: translateY(-10%) scaleX(-1.35) scaleY(0.85);
+            /* Largura levemente ajustada e equilibrada (-1.2) com altura proporcional ao zoom */
+            transform: translateY(-10%) scaleX(-1.2) scale(0.9);
             transition: transform 0.1s;
         }
         #moldura-preview {
@@ -132,7 +132,7 @@ html_code = """
             <div class="controles-duplos">
                 <div class="controle-item">
                     <label for="zoom" style="font-size: 13px; font-weight: bold;">🔍 Tamanho:</label>
-                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.85" oninput="ajustarCamera()">
+                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.9" oninput="ajustarCamera()">
                 </div>
                 <div class="controle-item">
                     <label for="pos-y" style="font-size: 13px; font-weight: bold;">↕️ Altura:</label>
@@ -173,8 +173,8 @@ html_code = """
         function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
             const posY = document.getElementById('pos-y').value;
-            // Alarga a largura isoladamente (-1.35) mantendo a escala de altura proporcional ao zoom
-            video.style.transform = `translateY(${posY}%) scaleX(-1.35) scaleY(${zoom})`;
+            // Espelhamento e proporção idênticos na prévia
+            video.style.transform = `translateY(${posY}%) scaleX(-1.2) scale(${zoom})`;
         }
 
         async function iniciarCamera() {
@@ -208,8 +208,9 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
-            const targetWidth = 720;
-            const targetHeight = 900;
+            // Força a proporção exata 4:5 (mesma proporção visual da caixa da moldura)
+            const targetWidth = 800;
+            const targetHeight = 1000;
             canvas.width = targetWidth;
             canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
@@ -220,11 +221,12 @@ html_code = """
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.translate(0, canvas.height * (posY / 100));
-            // Aplica separadamente o estiramento horizontal (-1.35 * zoom) e a altura vertical (zoom)
-            ctx.scale(-1.35 * zoom, zoom);
+            // Sincroniza exato o fator de escala horizontal (-1.2 * zoom) e vertical (zoom) com a tela
+            ctx.scale(-1.2 * zoom, zoom);
             ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
             ctx.restore();
             
+            // Carimba a moldura cobrindo o canvas por completo com a mesma proporção
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.95);
