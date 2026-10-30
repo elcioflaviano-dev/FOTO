@@ -54,8 +54,8 @@ html_code = """
         .camera-box {
             position: relative;
             width: 100%;
-            max-width: 300px; /* Mais estreito para fechar as laterais da moldura */
-            aspect-ratio: 4 / 5; /* Formato bem mais vertical e fechado */
+            max-width: 300px; /* Moldura estreita e elegante */
+            aspect-ratio: 4 / 5; /* Formato vertical */
             margin: 10px auto;
             border-radius: 10px;
             overflow: hidden;
@@ -69,7 +69,8 @@ html_code = """
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: translateY(-10%) scaleX(-1) scale(0.95);
+            /* Vídeo mais largo na tela (scaleX -1.2) para preencher melhor as laterais */
+            transform: translateY(-10%) scaleX(-1.2) scale(0.95);
             transition: transform 0.1s;
         }
         #moldura-preview {
@@ -172,7 +173,8 @@ html_code = """
         function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
             const posY = document.getElementById('pos-y').value;
-            video.style.transform = `translateY(${posY}%) scaleX(-1) scale(${zoom})`;
+            // Estica a largura da câmera (scaleX -1.2) mantendo a moldura intacta
+            video.style.transform = `translateY(${posY}%) scaleX(-1.2) scale(${zoom})`;
         }
 
         async function iniciarCamera() {
@@ -206,7 +208,7 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
-            // Define o canvas seguindo a proporção vertical mais estreita (4:5) para salvar exato
+            // Dimensões exatas e verticais para a foto final
             const targetWidth = 720;
             const targetHeight = 900;
             canvas.width = targetWidth;
@@ -219,12 +221,12 @@ html_code = """
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.translate(0, canvas.height * (posY / 100));
-            ctx.scale(-zoom, zoom);
-            // Centraliza e preenche o corte vertical 4:5 perfeitamente
+            // Aplica a largura esticada (-1.2) exclusivamente na foto da câmera ao salvar
+            ctx.scale(-1.2 * zoom, zoom);
             ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
             ctx.restore();
             
-            // Carimba a moldura ajustada nas dimensões estreitas
+            // Carimba a moldura mantendo seu tamanho original e estreito por cima
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.95);
