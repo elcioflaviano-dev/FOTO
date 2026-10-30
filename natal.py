@@ -69,7 +69,6 @@ html_code = """
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Inicia com a tela já encolhida e puxada para cima */
             transform: translateY(-15%) scaleX(-1) scale(0.7);
             transition: transform 0.1s;
         }
@@ -170,7 +169,6 @@ html_code = """
             molduraPreview.src = temaSelecionado;
         }
 
-        // Aplica o tamanho e a altura ao mesmo tempo no vídeo, escondendo a borda nas laterais e embaixo
         function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
             const posY = document.getElementById('pos-y').value;
@@ -208,26 +206,27 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
+            // Define o Canvas exatamente com a resolução real gerada pela câmara do dispositivo
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             
-            // Fundo preto garantido nas bordas, que ficarão sob a roupa do Papai Noel
+            // Fundo preto nativo para cobrir as margens excedentes
             ctx.fillStyle = "#000000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Transfere exatamente as posições da tela para o recorte final da foto
+            // Desenha a câmara aplicando os mesmos fatores visuais de escala e translação reais
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.translate(0, canvas.height * (posY / 100)); // Aplica a altura (para cima ou baixo)
-            ctx.scale(-zoom, zoom); // Aplica o zoom encolhendo o vídeo
+            ctx.translate(0, canvas.height * (posY / 100));
+            ctx.scale(-zoom, zoom);
             ctx.drawImage(video, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
             ctx.restore();
             
-            // Carimba a moldura intacta por cima
+            // Carimba a moldura em tamanho real idêntico ao original carregado
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
-            const imagemFinal = canvas.toDataURL('image/jpeg', 0.9);
+            const imagemFinal = canvas.toDataURL('image/jpeg', 0.95);
             const nomeArquivo = `Natal_${nome}_Cenario_${tema}.jpg`;
 
             try {
