@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Foto de Natal", page_icon="🎄", layout="centered")
 
 st.title("🎄Natal da Equipe")
-st.markdown("Escolha seu cenário, **ajuste o tamanho do seu rosto** na barra deslizando para os lados e envie sua foto!")
+st.markdown("Escolha seu cenário, **ajuste o tamanho e a altura do rosto** e envie sua foto!")
 
 html_code = """
 <!DOCTYPE html>
@@ -38,10 +38,9 @@ html_code = """
             font-size: 16px;
             box-sizing: border-box;
         }
-        /* Estilo da barra de zoom */
         input[type="range"] {
             width: 100%;
-            margin: 10px 0 15px 0;
+            margin: 5px 0 10px 0;
         }
         button {
             background-color: #ffcc00;
@@ -62,17 +61,16 @@ html_code = """
             overflow: hidden;
             background: #000;
             display: none;
-            /* Centraliza o vídeo para quando ele for reduzido pelo zoom */
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         video {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* O zoom padrão começa em 0.8 (levemente menor) para caber melhor o rosto */
-            transform: scaleX(-1) scale(0.8);
+            /* Inicia com a tela já encolhida e puxada para cima */
+            transform: translateY(-15%) scaleX(-1) scale(0.7);
             transition: transform 0.1s;
         }
         #moldura-preview {
@@ -85,6 +83,20 @@ html_code = """
             pointer-events: none; 
         }
         #status-envio { font-weight: bold; color: #ffeb3b; margin-top: 10px; display: none; }
+        
+        .controles-duplos {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .controle-item {
+            flex: 1;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -115,11 +127,18 @@ html_code = """
         
         <button id="btn-iniciar" onclick="iniciarCamera()">1. Ativar Câmera</button>
         
-        <!-- Bloco de câmera e controles de captura que aparecem depois -->
         <div id="area-captura" style="display:none;">
             
-            <label for="zoom" style="font-size: 14px; display: block; margin-top: 10px;">🔍 Ajustar Tamanho do Rosto:</label>
-            <input type="range" id="zoom" min="0.4" max="1.5" step="0.05" value="0.8" oninput="ajustarZoom()">
+            <div class="controles-duplos">
+                <div class="controle-item">
+                    <label for="zoom" style="font-size: 13px; font-weight: bold;">🔍 Tamanho:</label>
+                    <input type="range" id="zoom" min="0.3" max="1.5" step="0.05" value="0.7" oninput="ajustarCamera()">
+                </div>
+                <div class="controle-item">
+                    <label for="pos-y" style="font-size: 13px; font-weight: bold;">↕️ Altura:</label>
+                    <input type="range" id="pos-y" min="-50" max="50" step="2" value="-15" oninput="ajustarCamera()">
+                </div>
+            </div>
 
             <div class="camera-box" id="camera-box">
                 <video id="video" autoplay playsinline></video>
@@ -151,11 +170,11 @@ html_code = """
             molduraPreview.src = temaSelecionado;
         }
 
-        // Função nova para aplicar o zoom no vídeo em tempo real
-        function ajustarZoom() {
+        // Aplica o tamanho e a altura ao mesmo tempo no vídeo, escondendo a borda nas laterais e embaixo
+        function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
-            // Mantém o vídeo espelhado (scaleX -1) e aplica o zoom escolhido
-            video.style.transform = `scaleX(-1) scale(${zoom})`;
+            const posY = document.getElementById('pos-y').value;
+            video.style.transform = `translateY(${posY}%) scaleX(-1) scale(${zoom})`;
         }
 
         async function iniciarCamera() {
@@ -165,9 +184,8 @@ html_code = """
                 });
                 video.srcObject = stream;
                 
-                // Exibe a área de captura com o vídeo e o slider
                 areaCaptura.style.display = "block";
-                document.getElementById('camera-box').style.display = "flex";
+                document.getElementById('camera-box').style.display = "block";
                 document.getElementById('btn-iniciar').style.display = "none";
             } catch (erro) {
                 alert("Erro ao acessar a câmera. Verifique permissões.");
@@ -178,7 +196,9 @@ html_code = """
             const nome = document.getElementById('nome').value.trim().replace(/ /g, '_'); 
             const urlParts = document.getElementById('tema').value.split('/');
             const tema = urlParts[urlParts.length - 1].replace('.png', '');
+            
             const zoom = parseFloat(document.getElementById('zoom').value);
+            const posY = parseFloat(document.getElementById('pos-y').value);
 
             if (!nome) {
                 alert("Por favor, preencha o seu nome antes de tirar a foto!");
@@ -192,18 +212,19 @@ html_code = """
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             
-            // Pinta o fundo de preto caso o vídeo tenha sido muito reduzido pelo zoom
+            // Fundo preto garantido nas bordas, que ficarão sob a roupa do Papai Noel
             ctx.fillStyle = "#000000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Aplica a mesma matemática do zoom no canvas antes de "bater a foto"
+            // Transfere exatamente as posições da tela para o recorte final da foto
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.scale(-zoom, zoom); // Escala negativa no X para espelhar
+            ctx.translate(0, canvas.height * (posY / 100)); // Aplica a altura (para cima ou baixo)
+            ctx.scale(-zoom, zoom); // Aplica o zoom encolhendo o vídeo
             ctx.drawImage(video, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
             ctx.restore();
             
-            // Desenha a moldura por cima, sem aplicar zoom nela
+            // Carimba a moldura intacta por cima
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.9);
