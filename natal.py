@@ -4,9 +4,8 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Foto de Natal", page_icon="🎄", layout="centered")
 
 st.title("🎄Natal da Equipe")
-st.markdown("Escolha seu cenário abaixo, alinhe o rosto e envie sua foto diretamente para o nosso mural base.")
+st.markdown("Escolha seu cenário abaixo, alinhe o rosto e envie sua foto diretamente para o mural.")
 
-# Código HTML encapsulado com links absolutos e correção do CORS (Cross-Origin)
 html_code = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -18,16 +17,17 @@ html_code = """
             text-align: center;
             background-color: #0c3b2e; 
             color: white;
-            padding: 10px;
+            padding: 5px; /* Reduzido para dar mais espaço à câmera */
             margin: 0;
         }
         .container {
-            max-width: 400px;
+            width: 100%;
+            max-width: 100%; /* Força a ocupar a largura total do celular */
             margin: 0 auto;
             background: #b22222; 
-            padding: 15px;
+            padding: 10px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-sizing: border-box;
         }
         input, select, button {
             width: 100%;
@@ -50,8 +50,9 @@ html_code = """
         .camera-box {
             position: relative;
             width: 100%;
-            max-width: 350px;
-            margin: 15px auto;
+            max-width: 100%; /* Remove o limite antigo de 350px. Agora a moldura fica gigante! */
+            aspect-ratio: 3 / 4; /* Trava na proporção perfeita do sensor do celular */
+            margin: 10px auto;
             border-radius: 10px;
             overflow: hidden;
             background: #000;
@@ -59,6 +60,8 @@ html_code = """
         }
         video {
             width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
             transform: scaleX(-1);
         }
@@ -81,7 +84,6 @@ html_code = """
         
         <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
         
-        <!-- Apontando obrigatoriamente para os links absolutos do GitHub -->
         <select id="tema" onchange="trocarMoldura()">
             <option value="https://elcioflaviano-dev.github.io/FOTO/natal/1.png">Cenário 1</option>
             <option value="https://elcioflaviano-dev.github.io/FOTO/natal/2.png">Cenário 2</option>
@@ -105,7 +107,6 @@ html_code = """
         
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
-            <!-- Permissão crossorigin explícita adicionada aqui -->
             <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
         </div>
         
@@ -129,15 +130,16 @@ html_code = """
 
         function trocarMoldura() {
             const temaSelecionado = document.getElementById('tema').value;
-            // Força o navegador a aceitar a imagem hospedada fora do Streamlit
             molduraPreview.setAttribute('crossorigin', 'anonymous');
             molduraPreview.src = temaSelecionado;
         }
 
         async function iniciarCamera() {
             try {
+                // A MÁGICA DO ZOOM: Solicitando resolução 960x1280 (3:4), o navegador 
+                // usa o sensor frontal inteiro sem cortar as laterais.
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+                    video: { facingMode: "user", width: { ideal: 960 }, height: { ideal: 1280 } }
                 });
                 video.srcObject = stream;
                 document.getElementById('camera-box').style.display = "block";
@@ -161,6 +163,7 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
+            // O canvas assume perfeitamente as medidas do vídeo sem esticar
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
@@ -199,5 +202,4 @@ html_code = """
 </html>
 """
 
-# Renderiza o HTML dentro do Streamlit, reservando altura suficiente para a câmera e controles
-components.html(html_code, height=850, scrolling=True)
+components.html(html_code, height=950, scrolling=True)
