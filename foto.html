@@ -98,8 +98,8 @@
         
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
-            <!-- Corrigido para carregar a imagem 1 da pasta natal por padrão -->
-            <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
+            <!-- Permissão CrossOrigin adicionada -->
+            <img id="moldura-preview" src="natal/1.png" alt="Moldura" crossorigin="anonymous">
         </div>
         
         <canvas id="canvas" style="display:none;"></canvas>
@@ -123,10 +123,11 @@
 
         function trocarMoldura() {
             const temaSelecionado = document.getElementById('tema').value;
+            // Força a permissão em cada troca
             molduraPreview.setAttribute('crossorigin', 'anonymous');
             molduraPreview.src = temaSelecionado;
         }
-       
+        
         async function iniciarCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -143,7 +144,6 @@
 
         async function capturar() {
             const nome = document.getElementById('nome').value.trim().replace(/ /g, '_'); 
-            // Corrigido para remover a palavra "natal/" do nome do arquivo
             const tema = document.getElementById('tema').value.replace('natal/', '').replace('.png', '');
 
             if (!nome) {
