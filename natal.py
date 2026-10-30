@@ -136,8 +136,13 @@ html_code = """
 
         async function iniciarCamera() {
             try {
+                // Medidas invertidas para formato Retrato (em pé), removendo o corte de zoom
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+                    video: { 
+                        facingMode: "user", 
+                        width: { ideal: 1080 }, 
+                        height: { ideal: 1920 } 
+                    }
                 });
                 video.srcObject = stream;
                 document.getElementById('camera-box').style.display = "block";
