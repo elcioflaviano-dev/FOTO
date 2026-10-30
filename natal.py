@@ -6,7 +6,7 @@ st.set_page_config(page_title="Foto de Natal", page_icon="🎄", layout="centere
 st.title("🎄Natal da Equipe")
 st.markdown("Escolha seu cenário abaixo, alinhe o rosto e envie sua foto diretamente para o nosso mural base.")
 
-# Código HTML encapsulado com links absolutos para as imagens hospedadas no seu GitHub
+# Código HTML encapsulado com links absolutos e correção do CORS (Cross-Origin)
 html_code = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -81,31 +81,32 @@ html_code = """
         
         <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
         
-        <!-- Apontando para o repositório público onde as imagens estão hospedadas -->
+        <!-- Apontando obrigatoriamente para os links absolutos do GitHub -->
         <select id="tema" onchange="trocarMoldura()">
-            <option value="natal/1.png">Cenário 1</option>
-            <option value="natal/2.png">Cenário 2</option>
-            <option value="natal/3.png">Cenário 3</option>
-            <option value="natal/4.png">Cenário 4</option>
-            <option value="natal/5.png">Cenário 5</option>
-            <option value="natal/6.png">Cenário 6</option>
-            <option value="natal/7.png">Cenário 7</option>
-            <option value="natal/8.png">Cenário 8</option>
-            <option value="natal/9.png">Cenário 9</option>
-            <option value="natal/10.png">Cenário 10</option>
-            <option value="natal/11.png">Cenário 11</option>
-            <option value="natal/12.png">Cenário 12</option>
-            <option value="natal/13.png">Cenário 13</option>
-            <option value="natal/14.png">Cenário 14</option>
-            <option value="natal/15.png">Cenário 15</option>
-            <option value="natal/16.png">Cenário 16</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/1.png">Cenário 1</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/2.png">Cenário 2</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/3.png">Cenário 3</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/4.png">Cenário 4</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/5.png">Cenário 5</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/6.png">Cenário 6</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/7.png">Cenário 7</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/8.png">Cenário 8</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/9.png">Cenário 9</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/10.png">Cenário 10</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/11.png">Cenário 11</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/12.png">Cenário 12</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/13.png">Cenário 13</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/14.png">Cenário 14</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/15.png">Cenário 15</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/16.png">Cenário 16</option>
         </select>
         
         <button id="btn-iniciar" onclick="iniciarCamera()">1. Ativar Câmera</button>
         
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
-            <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura">
+            <!-- Permissão crossorigin explícita adicionada aqui -->
+            <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
         </div>
         
         <canvas id="canvas" style="display:none;"></canvas>
@@ -128,6 +129,8 @@ html_code = """
 
         function trocarMoldura() {
             const temaSelecionado = document.getElementById('tema').value;
+            // Força o navegador a aceitar a imagem hospedada fora do Streamlit
+            molduraPreview.setAttribute('crossorigin', 'anonymous');
             molduraPreview.src = temaSelecionado;
         }
 
@@ -147,7 +150,6 @@ html_code = """
 
         async function capturar() {
             const nome = document.getElementById('nome').value.trim().replace(/ /g, '_'); 
-            // Extrai apenas o número da imagem do link absoluto para usar no nome do arquivo
             const urlParts = document.getElementById('tema').value.split('/');
             const tema = urlParts[urlParts.length - 1].replace('.png', '');
 
