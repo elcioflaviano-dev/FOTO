@@ -75,7 +75,6 @@
         
         <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
         
-        <!-- TROQUE OS VALORES ABAIXO PELO NOME DOS ARQUIVOS QUE VOCÊ SUBIU NO GITHUB -->
         <select id="tema" onchange="trocarMoldura()">
             <option value="natal/1.png">Cenário 1</option>
             <option value="natal/2.png">Cenário 2</option>
@@ -99,8 +98,8 @@
         
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
-            <!-- A imagem inicial que carrega na tela -->
-            <img id="moldura-preview" src="nome_do_arquivo_1.png" alt="Moldura">
+            <!-- Corrigido para carregar a imagem 1 da pasta natal por padrão -->
+            <img id="moldura-preview" src="natal/1.png" alt="Moldura">
         </div>
         
         <canvas id="canvas" style="display:none;"></canvas>
@@ -113,7 +112,6 @@
     </div>
 
     <script>
-        // COLE AQUI A URL DO SEU GOOGLE APPS SCRIPT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsh8xXp6UfvNZR7ts3gadeUWwogMI8pro6PWIOEX-PnvVCl1lvF9SYyXgJvQKENC1CVw/exec";
 
         const video = document.getElementById('video');
@@ -144,7 +142,8 @@
 
         async function capturar() {
             const nome = document.getElementById('nome').value.trim().replace(/ /g, '_'); 
-            const tema = document.getElementById('tema').value.replace('.png', '');
+            // Corrigido para remover a palavra "natal/" do nome do arquivo
+            const tema = document.getElementById('tema').value.replace('natal/', '').replace('.png', '');
 
             if (!nome) {
                 alert("Por favor, preencha o seu nome antes de tirar a foto!");
@@ -168,7 +167,7 @@
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.9);
-            const nomeArquivo = `Natal_${nome}_${tema}.jpg`;
+            const nomeArquivo = `Natal_${nome}_Cenario_${tema}.jpg`;
 
             try {
                 await fetch(SCRIPT_URL, {
