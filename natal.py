@@ -54,7 +54,7 @@ html_code = """
         .camera-box {
             position: relative;
             width: 100%;
-            max-width: 300px; /* Moldura estreita e elegante */
+            max-width: 300px; /* Moldura estreita e fixa */
             aspect-ratio: 4 / 5; /* Formato vertical */
             margin: 10px auto;
             border-radius: 10px;
@@ -69,8 +69,8 @@ html_code = """
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Vídeo mais largo na tela (scaleX -1.2) para preencher melhor as laterais */
-            transform: translateY(-10%) scaleX(-1.2) scale(0.95);
+            /* Estica apenas a largura (-1.35) mantendo a altura intacta controlada pelo zoom */
+            transform: translateY(-10%) scaleX(-1.35) scaleY(0.85);
             transition: transform 0.1s;
         }
         #moldura-preview {
@@ -132,7 +132,7 @@ html_code = """
             <div class="controles-duplos">
                 <div class="controle-item">
                     <label for="zoom" style="font-size: 13px; font-weight: bold;">🔍 Tamanho:</label>
-                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.95" oninput="ajustarCamera()">
+                    <input type="range" id="zoom" min="0.4" max="1.8" step="0.05" value="0.85" oninput="ajustarCamera()">
                 </div>
                 <div class="controle-item">
                     <label for="pos-y" style="font-size: 13px; font-weight: bold;">↕️ Altura:</label>
@@ -173,8 +173,8 @@ html_code = """
         function ajustarCamera() {
             const zoom = document.getElementById('zoom').value;
             const posY = document.getElementById('pos-y').value;
-            // Estica a largura da câmera (scaleX -1.2) mantendo a moldura intacta
-            video.style.transform = `translateY(${posY}%) scaleX(-1.2) scale(${zoom})`;
+            // Alarga a largura isoladamente (-1.35) mantendo a escala de altura proporcional ao zoom
+            video.style.transform = `translateY(${posY}%) scaleX(-1.35) scaleY(${zoom})`;
         }
 
         async function iniciarCamera() {
@@ -208,7 +208,6 @@ html_code = """
             btnCapturar.disabled = true;
             statusEnvio.style.display = "block";
 
-            // Dimensões exatas e verticais para a foto final
             const targetWidth = 720;
             const targetHeight = 900;
             canvas.width = targetWidth;
@@ -221,12 +220,11 @@ html_code = """
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.translate(0, canvas.height * (posY / 100));
-            // Aplica a largura esticada (-1.2) exclusivamente na foto da câmera ao salvar
-            ctx.scale(-1.2 * zoom, zoom);
+            // Aplica separadamente o estiramento horizontal (-1.35 * zoom) e a altura vertical (zoom)
+            ctx.scale(-1.35 * zoom, zoom);
             ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
             ctx.restore();
             
-            // Carimba a moldura mantendo seu tamanho original e estreito por cima
             ctx.drawImage(molduraPreview, 0, 0, canvas.width, canvas.height);
 
             const imagemFinal = canvas.toDataURL('image/jpeg', 0.95);
