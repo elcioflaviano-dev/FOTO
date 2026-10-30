@@ -6,7 +6,6 @@ st.set_page_config(page_title="Foto de Natal", page_icon="🎄", layout="centere
 st.title("🎄Natal da Equipe")
 st.markdown("Escolha seu cenário abaixo, alinhe o rosto e envie sua foto diretamente para o nosso mural base.")
 
-# Código HTML encapsulado com links absolutos e correção do CORS (Cross-Origin)
 html_code = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -47,18 +46,23 @@ html_code = """
         }
         button:disabled { background-color: #999; cursor: not-allowed; }
         
+        /* Ajuste do formato 3x4 para não espremer a moldura */
         .camera-box {
             position: relative;
             width: 100%;
             max-width: 350px;
+            aspect-ratio: 3 / 4; 
             margin: 15px auto;
             border-radius: 10px;
             overflow: hidden;
             background: #000;
             display: none;
         }
+        /* Ajuste do vídeo para manter o campo aberto sem esticar */
         video {
             width: 100%;
+            height: 100%;
+            object-fit: cover; 
             display: block;
             transform: scaleX(-1);
         }
@@ -81,7 +85,6 @@ html_code = """
         
         <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
         
-        <!-- Apontando obrigatoriamente para os links absolutos do GitHub -->
         <select id="tema" onchange="trocarMoldura()">
             <option value="https://elcioflaviano-dev.github.io/FOTO/natal/1.png">Cenário 1</option>
             <option value="https://elcioflaviano-dev.github.io/FOTO/natal/2.png">Cenário 2</option>
@@ -105,7 +108,6 @@ html_code = """
         
         <div class="camera-box" id="camera-box">
             <video id="video" autoplay playsinline></video>
-            <!-- Permissão crossorigin explícita adicionada aqui -->
             <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
         </div>
         
@@ -129,20 +131,15 @@ html_code = """
 
         function trocarMoldura() {
             const temaSelecionado = document.getElementById('tema').value;
-            // Força o navegador a aceitar a imagem hospedada fora do Streamlit
             molduraPreview.setAttribute('crossorigin', 'anonymous');
             molduraPreview.src = temaSelecionado;
         }
 
         async function iniciarCamera() {
             try {
-                // Medidas invertidas para formato Retrato (em pé), removendo o corte de zoom
+                // Formato Retrato (em pé)
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: "user", 
-                        width: { ideal: 1080 }, 
-                        height: { ideal: 1920 } 
-                    }
+                    video: { facingMode: "user", width: { ideal: 1080 }, height: { ideal: 1920 } }
                 });
                 video.srcObject = stream;
                 document.getElementById('camera-box').style.display = "block";
@@ -204,5 +201,4 @@ html_code = """
 </html>
 """
 
-# Renderiza o HTML dentro do Streamlit, reservando altura suficiente para a câmera e controles
 components.html(html_code, height=850, scrolling=True)
