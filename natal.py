@@ -107,22 +107,21 @@ html_code = """
         <input type="text" id="nome" placeholder="Seu Nome (Ex: Joao Silva)">
         
         <select id="tema" onchange="trocarMoldura()">
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/1.png">Cenário 1</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/2.png">Cenário 2</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/3.png">Cenário 3</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/4.png">Cenário 4</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/5.png">Cenário 5</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/6.png">Cenário 6</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/7.png">Cenário 7</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/8.png">Cenário 8</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/9.png">Cenário 9</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/10.png">Cenário 10</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/11.png">Cenário 11</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/12.png">Cenário 12</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/13.png">Cenário 13</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/14.png">Cenário 14</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/15.png">Cenário 15</option>
-            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/16.png">Cenário 16</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duenda com presente.png">DUENDA COM PRESENTE</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende dando joinha.png">DUENDE DANDO JOINHA</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende dando tchau.png">DUENDE DANDO TCHAU</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende dançando.png">DUENDE DANÇANDO</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende de verde.png">DUENDE DE VERDE</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende mãe noel.png">DUENDE MÃE NOEL</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende orelhudo.png">DUENDE ORELHUDO</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende pulando.png">DUENDE PULANDO</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/duende sentado.png">DUENDE SENTADO</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/grinch de papai noel.png">GRINCH DE PAPAI NOEL</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/grinch.png">GRINCH</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/papai noel com presente.png">PAPAI NOEL COM PRESENTE</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/papai noel.png">PAPAI NOEL</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/rena.png">RENA</option>
+            <option value="https://elcioflaviano-dev.github.io/FOTO/natal/reninha.png">RENINHA</option>
         </select>
         
         <button id="btn-iniciar" onclick="iniciarCamera()">1. Ativar Câmera</button>
