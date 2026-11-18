@@ -141,7 +141,7 @@ html_code = """
 
             <div class="camera-box" id="camera-box">
                 <video id="video" autoplay playsinline></video>
-                <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/1.png" alt="Moldura" crossorigin="anonymous">
+                <img id="moldura-preview" src="https://elcioflaviano-dev.github.io/FOTO/natal/papai noel.png" alt="Moldura" crossorigin="anonymous">
             </div>
             
             <canvas id="canvas" style="display:none;"></canvas>
